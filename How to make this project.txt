@@ -1,0 +1,70 @@
+first i created the model oh the object i want which in this case was the contact. 
+then I created the dbContext class to create a table of contacts that derives from the model class. 
+thereafter depency inject into program.cs and create the controller for the CRUD operations. 
+
+Create UpdateContactRequest & AddContactRequest while making the CRUD operations for them. 
+
+I installed these packages: 
+Microsoft.EntityFrameworkCore.InMemory
+Microsoft.EntityFrameworkCore.SqlServer
+Microsoft.EntityFrameworkCore.Tools
+
+MSSQL and MSSM studio are used for the database. 
+
+This is how depency injection is when using inmemory
+builder.Services.AddDbContext<ContactsAPIDbContext>(options => options.UseInMemoryDatabase("ContactsDb"));
+
+This is how to start you controller class and put DbContext in it: 
+
+private readonly ContactsAPIDbContext dbContext;
+public ContactsController(ContactsAPIDbContext dbContext)
+{
+    this.dbContext = dbContext;
+}
+
+Add these two to the beginning of your controller class: 
+[ApiController]
+[Route("api/[controller]")]
+
+When going over to using a server for your code: 
+go to your appsetting.json
+add under : "AllowedHosts": "*" the following: 
+
+"ConnectionStrings": {
+  "ContactsApiConectionString" : "Server= YourDataBaseNameFromSSMS;Database=ContactsDb;Trusted_Connection=true; Encrypt:false"
+}
+
+then in program.cs u inject: 
+options.UseSqlServer(builder.Configuration.GetConnectionString("The name u gave in appsetting.json")));
+
+After open in (Tools => NuGet Package Maanger => Package Manager console)
+then write 2 commands in the console: 
+Add-Migration "write a name (for example Inital Migration)"
+Update-Database
+
+
+Add-Migration creates a new folder called Migrations. 
+OBS: WHEN RUNNING Update-Database u might encounter an error about Global somthing:
+go to ur .csproj file and change to: 
+<InvariantGlobalization>false</InvariantGlobalization> 
+
+___________________________________________________________________________
+when making a frontend app that send the contact to ur backend, u might get an error when sending the data. 
+in ur program.cs file add: 
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowOrigin", builder =>
+    {
+        builder.WithOrigins(THe running server from website frontend)
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+app.UseCors("AllowOrigin");
+
+
+
+
+
+
